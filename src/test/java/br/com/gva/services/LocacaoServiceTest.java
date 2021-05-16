@@ -6,7 +6,9 @@ import java.util.Date;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 
 import br.com.gva.entidades.Filme;
 import br.com.gva.entidades.Locacao;
@@ -14,6 +16,9 @@ import br.com.gva.entidades.Usuario;
 import br.com.gva.utils.DataUtils;
 
 public class LocacaoServiceTest {
+
+	@Rule
+	public ErrorCollector error = new ErrorCollector();
 
     @Test
 	public void teste() {
@@ -25,13 +30,12 @@ public class LocacaoServiceTest {
 		//acao
 		Locacao locacao = service.alugarFilme(usuario, filme);
 		
-		//verificacao - Troquei o CoreMatchers.assertThat() pela classe MatcherAssert.assertThat(), visto que o anterior está depreciado
-		//Fluid Interface usando alguns método de CoreMatcher para deixar a leitura do código masi fluida
-		MatcherAssert.assertThat(locacao.getValor(), CoreMatchers.is(5.0));
-		MatcherAssert.assertThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.not(6.0)));
+		//Usando o método checkThat() da classe ErrorCollector temos uma pilha de erros, mesmo em um único método
+		error.checkThat(locacao.getValor(), CoreMatchers.is(5.0));
+		error.checkThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.not(6.0)));
 
-		Assert.assertTrue(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()));
-		Assert.assertTrue(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)));
+		error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), CoreMatchers.is(true));
+		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)), CoreMatchers.is(false));
 	}
     
 }
