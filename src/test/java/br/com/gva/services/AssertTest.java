@@ -55,6 +55,9 @@ public class AssertTest {
 
         //Verificar nulo
         Assert.assertNull(u1);
+
+        //Verificar não nulo(Depreciado)
+        Assert.assertNotNull(u1);
     }
     
 }
